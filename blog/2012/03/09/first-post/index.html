@@ -5,14 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Blog Archive - メモ</title>
+  <title>ファーストポスト - メモ</title>
   <meta name="author" content="N.Nakasato">
 
   
-  <meta name="description" content="Blog Archive 2012 TOP500 and Intel Phi
-Jun 19 2012 GPU Instruction Mix
-May 10 2012 gnuplot on Ubuntu 10.04
-Apr 11 2012 Note on Regional Advantage &hellip;">
+  <meta name="description" content="テスト的な投稿 IEEE 754規格についてのインタビュー記事 But DEC&#8217;s original double precision `D&#8217; format had the same eight exponent bits as had its single &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +18,7 @@ Apr 11 2012 Note on Regional Advantage &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://dadeba.github.com/blog/archives">
+  <link rel="canonical" href="http://dadeba.github.com/blog/2012/03/09/first-post">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -64,121 +61,127 @@ Apr 11 2012 Note on Regional Advantage &hellip;">
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Blog Archive</h1>
+    
+      <h1 class="entry-title">ファーストポスト</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T00:00:00+09:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives">
 
 
+<div class="entry-content"><h2>テスト的な投稿</h2>
 
-  
-  <h2>2012</h2>
+<p><a href="http://www.cs.berkeley.edu/~wkahan/ieee754status/754story.html">IEEE 754規格についてのインタビュー記事</a></p>
 
-<article>
-  
-<h1><a href="/blog/2012/06/19/top500-and-intel-phi/">TOP500 and Intel Phi</a></h1>
-<time datetime="2012-06-19T22:55:00+09:00" pubdate><span class='month'>Jun</span> <span class='day'>19</span> <span class='year'>2012</span></time>
+<blockquote><p>But DEC&#8217;s original double precision `D&#8217; format had the same eight exponent bits as had its single precision `F&#8217; format. This exponent range had turned out too narrow for some double precision computations. DEC reacted by introducing its `G&#8217; double precision format with an 11 bit exponent that had served well enough in CDC&#8217;s 6600/7600 machines for over a decade; K-C-S had chosen that exponent range too for its double precision.</p></blockquote>
 
 
-</article>
+<p>&#8220;K-C-S&#8221;とは最終的に754規格として採用されたもののドラフト。</p>
+
+<h2>コードのはりつけ</h2>
+
+<p>codeblcok</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/zsh
+</span><span class='line'>echo "$(pwd -P)/intel/libintelocl.so" >| OpenCL/intelocl64.icd</span></code></pre></td></tr></table></div></figure>
 
 
+<p>backtick</p>
 
-<article>
-  
-<h1><a href="/blog/2012/05/10/gpu-instruction-mix/">GPU Instruction Mix</a></h1>
-<time datetime="2012-05-10T09:44:00+09:00" pubdate><span class='month'>May</span> <span class='day'>10</span> <span class='year'>2012</span></time>
-
-
-</article>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/zsh
+</span><span class='line'>echo "$(pwd -P)/intel/libintelocl.so" &gt;| OpenCL/intelocl64.icd</span></code></pre></td></tr></table></div></figure>
 
 
+<p>どっちも同じか。</p>
 
-<article>
-  
-<h1><a href="/blog/2012/04/11/gnuplot-on-ubuntu-10-dot-04/">gnuplot on Ubuntu 10.04</a></h1>
-<time datetime="2012-04-11T13:54:00+09:00" pubdate><span class='month'>Apr</span> <span class='day'>11</span> <span class='year'>2012</span></time>
+<h2>OpenCLでのBulldozer(8 core)とSandybridge(6 core)の性能比較</h2>
 
+<p>AMDとIntelのSDKをそれぞれのCPUで比較した。
+BulldozerはFX-8150(8 core)。SandybridgeはCore i7 3960X(6 core)。</p>
 
-</article>
+<p><img src="http://galaxy.u-aizu.ac.jp/permanent/SPH_SB_BD_Tahiti.png"></p>
 
-
-
-<article>
-  
-<h1><a href="/blog/2012/03/28/note-on-regional-advantage/">Note on Regional Advantage</a></h1>
-<time datetime="2012-03-28T00:00:00+09:00" pubdate><span class='month'>Mar</span> <span class='day'>28</span> <span class='year'>2012</span></time>
-
-
-</article>
+<ul>
+<li>BulldozerではAMDのSDKのほうが速い</li>
+<li>SandybridgeではIntelのSDKのほうが速い</li>
+<li>Tahiti最強</li>
+</ul>
 
 
+<h2>markdownの概略</h2>
 
-<article>
-  
-<h1><a href="/blog/2012/03/23/g5-like-functions-in-opencl/">G5 like functions in OpenCL</a></h1>
-<time datetime="2012-03-23T00:00:00+09:00" pubdate><span class='month'>Mar</span> <span class='day'>23</span> <span class='year'>2012</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2012/03/16/more-note-on-parallel-octree/">More Note on Parallel Octree</a></h1>
-<time datetime="2012-03-16T00:00:00+09:00" pubdate><span class='month'>Mar</span> <span class='day'>16</span> <span class='year'>2012</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2012/03/10/note-on-opencl-sdks/">Note on OpenCL SDKs</a></h1>
-<time datetime="2012-03-10T00:00:00+09:00" pubdate><span class='month'>Mar</span> <span class='day'>10</span> <span class='year'>2012</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2012/03/09/first-post/">ファーストポスト</a></h1>
-<time datetime="2012-03-09T00:00:00+09:00" pubdate><span class='month'>Mar</span> <span class='day'>09</span> <span class='year'>2012</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2012/02/28/us-national-labs-and-supercomputing/">US National Labs and Supercomputing</a></h1>
-<time datetime="2012-02-28T00:00:00+09:00" pubdate><span class='month'>Feb</span> <span class='day'>28</span> <span class='year'>2012</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2012/02/27/cray-and-supercomputers/">Cray and Supercomputers</a></h1>
-<time datetime="2012-02-27T00:00:00+09:00" pubdate><span class='month'>Feb</span> <span class='day'>27</span> <span class='year'>2012</span></time>
-
-
-</article>
-
+<p><a href="http://ja.wikipedia.org/wiki/Markdown">http://ja.wikipedia.org/wiki/Markdown</a></p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">N.Nakasato</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T00:00:00+09:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://dadeba.github.com/blog/2012/03/09/first-post/" data-via="dadeba" data-counturl="http://dadeba.github.com/blog/2012/03/09/first-post/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/02/28/us-national-labs-and-supercomputing/" title="Previous Post: US National Labs and Supercomputing">&laquo; US National Labs and Supercomputing</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/03/10/note-on-opencl-sdks/" title="Next Post: Note on OpenCL SDKs">Note on OpenCL SDKs &raquo;</a>
+      
+    </p>
+  </footer>
 </article>
 
 </div>

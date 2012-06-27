@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>My Octopress Blog</title>
-  <meta name="author" content="Your Name">
+  <title>メモ</title>
+  <meta name="author" content="N.Nakasato">
 
   
-  <meta name="description" content=" Blog Archives Recent Posts ">
+  <meta name="description" content="2012年6月18日に、High Perfomance Linpackの実行によるベンチマークランキングのtop500の最新結果が発表された。 150位の「Discovery」というシステムは、IntelのGPUみたいなものIntel Xeon Phi(Intel MIC) &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,13 +18,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://dadeba.github.com/">
+  <link rel="canonical" href="http://dadeba.github.com">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="メモ" type="application/atom+xml">
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -35,9 +35,7 @@
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">memo</a></h1>
-  
-    <h2>A blogging framework for hackers.</h2>
+  <h1><a href="/">メモ</a></h1>
   
 </hgroup>
 
@@ -65,6 +63,1177 @@
       <div class="blog-index">
   
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/19/top500-and-intel-phi/">TOP500 and Intel Phi</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-19T22:55:00+09:00" pubdate data-updated="true">Jun 19<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>2012年6月18日に、High Perfomance Linpackの実行によるベンチマークランキングのtop500の最新結果が発表された。</p>
+
+<p>150位の「Discovery」というシステムは、IntelのGPUみたいなものIntel Xeon Phi(Intel MIC)のボードを利用したクラスターである。</p>
+
+<p>このシステムでは、CPUとして「Xeon E5-2670 8C 2.600GHz」を利用し、アクセラレータとして「Intel MIC」を使い、
+インターコネクトは「Infiniband FDR」を採用している。利用されている総コア数は9800個であり、
+アクセラレータ部分のコア数は7560個であった。よって、CPUの総コア数は2240個であり、E5-2670は全部で280個になる。
+7560は280で割り切ることができて27が答えである。
+コア数としてわざわざ奇数を採用することはあまりなさそうなので、
+「Intel Xeon Phi」のコア数は54なのだと思われる。</p>
+
+<p>「Xeon E5-2670 8C 2.600GHz」の倍精度演算演算性能は166.4 GFLOPS (AVX命令でfaddとfmulを同時実行時)であるから、
+CPU部分のRpeak(ピーク性能)は46.592 TFLOPSである。
+一方、「Discovery」のRpeakは公表されたテーブルによると180.992 TFLOPSであった。
+これから「Intel Xeon Phi」部分のRpeakは134.4 TFLOPSという計算になる。
+全部で140ボードを仮定すると、このRpeak値から計算したボードあたりの性能は0.96 TFLOPSになる。
+54コアだと思うと、1コアあたりでは17.8 GFLOPSという換算となる。
+これまで公表されたアーキテクチャの情報によれば、「Intel Xeon Phi」のコアにおける倍精度浮動小数点演算器は、
+ベクトル長が8のSIMD演算器ということなので、1クロックあたりの演算数は16演算(Intel E5の2倍)である。
+演算性能をクロックに換算すると約1113 MHzとなる。
+結果、2個のE-2670と1個のPhiを組み合わせたノードのRpeakは1.1264 TFLOPSである。</p>
+
+<p><a href="http://newsroom.intel.com/community/intel_newsroom/blog/2012/06/17/latest-intel-xeon-processors-e5-product-family-achieves-fastest-adoption-of-new-technology-on-top500-list">この</a>
+プレスリリースをよく読むと、今回の結果はPhi 1個で1 TFLOPSを超えたとは書いてはいなくて、
+あくまでも「ノードあたり1 TFLOPS超」とあるので、つじつまはあっている。
+「Intel Xeon Phi」は、Intelの22nmプロセスを使い、3D Tri-gateトラジスタにより製造されているそうである。
+同じプロセスとテクノロジーは、最近発表されたIvy Bridgeアーキテクチャのプロセッサでも採用されている。
+その中でも、現時点で最も高速なプロセッサは「Xeon E3 1290 v2」と呼ばれている1P Server用のもので、
+3.7/4.1 GHzで動作する。後者はターボ時の動作周波数である。</p>
+
+<p>Phiのオンチップネットワークの情報は公開されていないが、仮にmeshのようなものだとすると、
+54コアはいかにもおかしく、実際には64コアである可能性がある。
+つまり、歩留まりをあげるためか、消費電力を下げるために、全てのコアがアクティブされてないのだろう。
+というのも、プレスリリースにあるように、2011年秋のデモンストレーションでは、
+1ボードあたりではじめて倍精度演算1 TFLOPSを達成した、とあるからである。
+クロック周波数固定でスケーリングすれば、1.138 TFLOPSとなり、これまたつじつまはあいそうである。
+ただし、このデモンストレーションは、SC11の会場で展示などがされていたわけではなく、
+実際には公開されていなかったはずで、プレスだけに見せられたようであった。</p>
+
+<p>すでに手に入るAMDのハイエンドGPUアーキテクチャTahitiは、
+クロックあたり512回の倍精度FMA演算が可能であり、
+リファレンス周波数の925 MHzでの性能は0.947 TFLOPSであった。
+偶然ながらPhiとあまり変わらない性能になっている。
+しかし、TahitiはTSMCの28 nmバルクプロセスで製造されており、Intelの22nmかつ3Dトランジスタと比べると、
+相当不利なはずだが、一方で、Phiのコアはx86_64命令を実行可能であり、しかもオンチップネットワークがmeshなら、
+Tahitiのツリー型のネットワーク(非常におおざっぱにいった場合)とくらべると、
+リソースが厳しいのかもしれない。
+どちらも外部メモリインターフェイスはGDDR5で、Tahitiはリファレンスボードでは3 GB、
+Phiはプレスリリースによると最低8 GBのメモリをもつとのこと。
+Tahitiのメモリインターフェイス幅は384 bitで、6 chのメモリコントローラを持つ。
+これから想像すると、Phiは4 or 8 chのメモリコントローラを持つはずである。
+GDDR5は規格上、データ転送にはエラー検出機構があり、
+エラーがあった場合再送が発生するそうである(この部分伝聞。規格書をあたったわけではない)。
+つまり、GDDR5を採用した時点で、メモリ転送自体はエラーからプロテクトされている
+(外部メモリ自体がECCに対応しているのかどうかとは独立)。
+最近のハイエンドGPUはTahitiに限らず、内部にレジスタとキャッシュとして大量のSRAMがあり、
+これらはTahitiの場合は、噂によると、ECCで保護されている。
+一方、サーバ用ではないx86プロセッサは、
+通常プロセッサ内部メモリにECC機構がないが、Phiもそのような設計なのかは不明である。
+「Xeon」というブランドをつけたと言うことは、
+ある程度のRAS機能をサポートしていることを示唆しているのかもしれない。</p>
+
+<p>「Discovery」のHPL性能について。システムのRmaxは118.6 TFLOPSであり、Rmax/Rpeakは65.53％であった。
+報告されている消費電力は100.8 kWであり、電力あたりの性能は1.177 GFLOPS/Wとなり、
+同じE5のCPUとNVIDIA M2090を利用したシステムと同程度である。
+例えば筑波大学のHA-PACSベースクラスタ(41位)は、
+ノードのCPUは「Discovery」と同じで、M2090はノードあたり4枚、インターコネクトはInifiniband QDRが2本(64 Gbps)であるが、
+1.035 GFLOPS/Wの性能であった(Rmax/Rpeakは54.18％)。
+おおざっぱには、NVIDIA M2050などを利用した他のクラスタも似たり寄ったりの性能と効率である。
+Rmax/Rpeak比を比較すると、「Discovery」はHA-PACSよりもかなりよい。
+これが意味することは、M2050/M2090では単体でのRmax/Rpeak比はたかだか60％であるから、
+Phi単体のRmax/Rpeak比は65％を大きく上回っていることである。
+なお、Xeon E5のみからなるシステムのRmax/Rpeak比は、
+例えば4位の「SuperMUC」の場合90.96％である。
+Phi単体のRmax/Rpeak比もこれに近い値かもしれない。
+ただし、アクセラレータを利用する　HPLでは、アクセラレータはDGEMMのみに利用する。
+HPLはDGEMMの演算部分が非常に大きい割合ではあるが、
+実際にはDGEMM意外にも色々な計算があり、DGEMMが高速であればあるほど、
+それ以外の部分の最適化がキーとなる。
+これは、ベクトル計算機の最適化と同じく、ベクトル化(アクセラレータ利用部分)率をできるだけ向上させることに相当するが、
+昔のベクトル計算機との違いは、比喩としてのベクトル演算性能(アクセラレータ部分の性能)と、
+比喩としてのスカラー演算性能(CPU部分の性能)の比率が、拮抗していることである。
+「Discovery」の場合は約６：１になっている。
+CPUのみからなるシステムと比較すると、比喩としてのスカラー演算の最適化の影響が非常に大きい。
+よって、比喩としてのベクトル演算性能が非常に高くても、
+全体のRmax/Rpeak比を90％にすることは非常に困難である。</p>
+
+<p>これは、以下のように説明できる：CPUのみのシステムでDGEMMにかかる時間の割合をfとする。
+さらに、DGEMMのRmax/Rpeak比をXとし、それ以外の比をYとした場合、Rmax = (1-f)<em>Y</em>Rpeak + f<em>X</em>Rpeakとなる。
+CPUのみのシステムの場合、Xは100％に近いはずであるが、Yはそれほど大きくはないはずである。
+しかし、問題サイズが十分大きいならはfは限りなく100％に近くなるはずなので、
+Rmax/Rpeak比は第二項のみで決まることになる。
+仮に問題サイズを変えずに、アクセラレータを使う場合、
+fが元の数分の一になってしまうため、Rmaxにおける第一項は無視できなくなる。
+スカラー演算性能とベクトル演算性能の比をQとすると、「Discovery」の場合はQ = 1/6である。
+Qの関数として、Rmax/Rpeak = (1/Q - 1) Y + 1/( 1 + 1/Q ) X = 5/7 Y + 1/7 X となる。
+つまりYの値がクリティカルである。
+X = 90％, Y = 70％の場合Rmax/Rpeak = 63％となった。Yが80％なら70％である。
+結局比喩としてのベクトル演算性能が極大化されたとしても、
+Qの値が極端な場合、つまりバランスのとれたシステムでない場合、
+HPLでRmax/Rpeak比の高効率を得ることはより困難となる。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/10/gpu-instruction-mix/">GPU Instruction Mix</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-10T09:44:00+09:00" pubdate data-updated="true">May 10<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>&#8220;A parallel hashed Oct-Tree N-body algorithm&#8221; (<a href="http://dl.acm.org/citation.cfm?id=169640">http://dl.acm.org/citation.cfm?id=169640</a>) を論文セミナーで学生に紹介してもらった。案外細部は覚えていないもので、発見があった。</p>
+
+<p>この論文は並列ツリーコードの新しいアルゴリズムを提案し、Intel Touchstone Deltaでの性能評価を報告した論文である。SC&#8217;93で発表された。512プロセッサで、Cold Dark Matterモデルを計算した場合の実効性能は5 - 6 GFLOPSとなった。</p>
+
+<p>Seciton 4の最後の部分：</p>
+
+<blockquote><p>If we count only the floating point operations performed in the force calculation routine as “useful work” (30 flops per interaction) the overall speed of the code is about 5-6 Gflops. However, this number is in a sense unfair to the overall algorithm, since the majority of the code is not involved in floating point operations at all, but with tree traversal and data structure manipulation. The integer arithmetic and addressing speed of the processor areas impoctant as the floating point performance. We hope that in the future, evaluation of processors does not become overbalanced toward better floating point speed at the expense of integer arithmetic and memory bandwidth, as this code is a good example of why a balanced processor architecture is necessary for good overall performance.</p></blockquote>
+
+
+<p>この実効性能は、ツリー法で計算した粒子相互作用の浮動小数点演算数のみをカウントした場合である。単純に粒子相互作用だけを計算した場合の性能は14 GFLOPSくらいになるのに対して、実効性能はそれの30％しかない。その理由は、粒子間相互作用以外にも、まずツリーを構築する時間が必要で、さらにツリーをたどる時間やプロセッサ間通信のためにも時間がかかるためである。そのため、引用部に書いてある通り、浮動小数点演算性能だけでなく、主にアドレス計算に使われる整数演算や、このツリーアルゴリズムの場合にはshiftや論理積のような演算の性能もcriticalになってくる。</p>
+
+<h2>Instruction Mixの実際</h2>
+
+<p>では最近のGPUで似たような計算をやるとどうなるのか。直接的な結果はさておき、浮動小数点演算数とその他の命令の割合を調べてみた。これはInstructin Mixと呼ばれている。ツリーをたどりながら重力を計算するkernelをOpenCLで実装し、様々な命令の割合を調べてみた。ターゲットはSourthern IslandアーキテクチャのRadeon HD7970である。</p>
+
+<h4>VL=1</h4>
+
+<table>
+<thead>
+<tr>
+<th>命令種類 </th>
+<th> 命令数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮動小数点演算 </td>
+<td> 25</td>
+</tr>
+<tr>
+<td>整数演算       </td>
+<td> 60</td>
+</tr>
+<tr>
+<td>load/store等   </td>
+<td> 42</td>
+</tr>
+<tr>
+<td>合計           </td>
+<td> 129</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>VL=2</h4>
+
+<table>
+<thead>
+<tr>
+<th>命令種類 </th>
+<th> 命令数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮動小数点演算 </td>
+<td> 50</td>
+</tr>
+<tr>
+<td>整数演算       </td>
+<td> 76</td>
+</tr>
+<tr>
+<td>load/store等   </td>
+<td> 52</td>
+</tr>
+<tr>
+<td>合計           </td>
+<td> 172</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>VL=4</h4>
+
+<table>
+<thead>
+<tr>
+<th>命令種類 </th>
+<th> 命令数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮動小数点演算 </td>
+<td> 100</td>
+</tr>
+<tr>
+<td>整数演算       </td>
+<td> 104 </td>
+</tr>
+<tr>
+<td>load/store等   </td>
+<td> 72</td>
+</tr>
+<tr>
+<td>合計           </td>
+<td> 252</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>VL=8</h4>
+
+<table>
+<thead>
+<tr>
+<th>命令種類 </th>
+<th> 命令数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮動小数点演算 </td>
+<td> 128</td>
+</tr>
+<tr>
+<td>整数演算       </td>
+<td> 146</td>
+</tr>
+<tr>
+<td>load/store等   </td>
+<td> 113</td>
+</tr>
+<tr>
+<td>合計           </td>
+<td> 331</td>
+</tr>
+</tbody>
+</table>
+
+
+<h2>考察</h2>
+
+<p>このカーネルは単精度演算を使っているので、浮動小数点演算は命令のpostfixが&#8221;f32&#8221;のものを指す。整数演算は&#8221;i32&#8221;, &#8220;b32&#8221;, &#8220;b64&#8221;等のpostfixの命令。load/store等は、文字通りのloadとstore命令に加えて、&#8221;mov&#8221;のpostfixがついている、レジスタ間コピー命令等を含む。一部命令の数え方が重複しているので、総和が合計には一致しないことに注意。</p>
+
+<p>&#8220;VL&#8221;はkernelのベクトル化率。大きくすれば、ロード当たりの演算数が増えるが、レジスタ利用量が増える。実験によると最適なのはVL=4 or 8である。浮動小数点の割合は50％を下回っており、VL=1,2,4,8の時それぞれ、19.4％、29.1％、39.7％、38.7％になった。実験してみるとVL=4とVL=8ではあまり性能が変わらない。これは単に命令の種類ごとに数を数えているだけであり、分岐やループを考慮していないので、実際に実行される命令ごとの割合を調べると多少は違いがあるだろう。が、傾向としては、割合明確であった。WS93論文でもは実効性能が理論性能の30％程度である。彼らも詳細は異なるが、ここでいうベクトル化に相当することをしている。一方GPUでのツリーコードの実効性能は30命令換算ではVL=4の時に300 GFLOPS程度になる(ツリー構築やGPUとのI/Oの時間を含んだ換算)。7970の理論性能はFMA命令を使う場合は3.7 TFLOPSである。WS93の時代はFMA命令はなかったので、そこを考慮すると、我々の実効性能は16％くらいになる。分岐命令に弱いというGPUアーキテクチャではあるが、あまりかけ離れた数字ではない。汎用プロセッサでも分岐命令はそれなりのオーバーヘッドになるので、そんなもんかも。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/11/gnuplot-on-ubuntu-10-dot-04/">Gnuplot on Ubuntu 10.04</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-11T13:54:00+09:00" pubdate data-updated="true">Apr 11<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>http://www.timteatro.net/2010/07/17/compiling-gnuplot-from-cvs-with-ubuntu/</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo aptitude install automake checkinstall libwxgtk2.8-dev libpango1.0-dev libreadline5-dev libx11-dev libxt-dev texinfo libgd2-xpm-dev liblua5.1-dev lua50  </span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/28/note-on-regional-advantage/">Note on Regional Advantage</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-28T00:00:00+09:00" pubdate data-updated="true">Mar 28<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>&#8220;Regional Advantage&#8221; by AnnaLee Saxenian 「現代の二都物語」山形浩生・柏木亮二訳</h3>
+
+<p>についてのメモ。</p>
+
+<p>日本語訳だと一部わかりにくいところがあり、原文を読んだ方がよいのかな。</p>
+
+<p>「二都」とはアメリカのニューイングランド(ルート128)とカリフォルニア(シリコンバレー)のこと。
+アメリカの東側で立ち上がったコンピューターという技術とそれに関連する産業が発展してきた背景には、
+この両地域での半導体およびコンピューターメーカ−、それもベンチャー企業の急成長がある。
+ものすごく大雑把にコンピューター本体側だけの歴史をまとめると、
+1960年代まではコンピューターといえばIBMの大型計算機だったのが、
+1970年代DECによるミニコンピューターの発見に続くと類似ミニコンメーカーの興隆があり、
+それが1980年代にSUNやアポロによるワークステーション(WS)の発見に続くWSメーカーの興隆があり、
+と同時に、本当のマイクロプロセッサを使ったPCやAppleなどの小さな計算機の発見とものすごい発展があった。
+時代が変わるごとに、新しい小さなものが既存の大きなものの陣地を浸食すると同時に、
+それまでになかった市場を開拓してきたので、
+1950年代からこれまでのコンピューター本体の関わる産業の成長率はものすごく高かった。
+その裏では、半導体産業とソフトウエア産業、あるいは最近だとネットワーク関連産業の大きな発展もあった。
+この両地域に絞ると、ミニコンはルート128のもので、WSやマイクロプロセッサはシリコンバレー、
+また半導体企業とソフトウエア産業はシリコンバレーが拠点である。
+既に「ミニコン」が消えて久しいことからわかるように、1980年代以降、ルート128周辺から、
+急成長をとげたような企業は皆無である。一方で、シリコンバレーは1980年代からこの30年以上にわたり、
+手を変え品を変え急成長企業が生まれ続けている。最新の最も成功した例はGoogleだろう。
+この違いは何か、というのがこの本の主題。</p>
+
+<p>途中、1980年代にシリコンバレーでDRAMを作る企業が成長していたが、
+その市場が日本政府の「戦略」により、日本企業の連合に追い上げられ、
+結果的にはアメリカからDRAMを作る企業が一層されてしまった件の記述もある。
+二都の対比だけでなく、シリコンバレー vs. 日本企業群という対比もあるわけだ
+(今はこれに、台湾政府、韓国政府、中国政府がプレイヤーとなり、
+日本の政府と企業も、1980年代のシリコンバレーと同じ危機を迎えている、というループ)。
+後付けの説明としては、その時に日本企業がDRAM市場を席巻したのは、円安のためでなく、
+シリコンバレーの会社よりも効率よくDRAMを生産する工場を作ったからとのこと。
+60%ぐらいは、今起きていることも全く同じっちゃー、同じ。</p>
+
+<p>その時に、代表的なシリコンバレーの半導体企業であるIntelは、
+DRAMからマイクロプロセッサ専業に方針を変え、
+他の会社もDRAMのような汎用部品ではなく、
+特定顧客向けのカスタムLSIを作る会社になって、その危機を切り抜けてきたという。
+この時に、半導体のデザインだけに特化して、製造は他社にまかせるファブレス企業が確立したらしい。</p>
+
+<p>210ページより：</p>
+
+<blockquote><p>新興企業アルテラの重役は、外部ベンダー利用と社内製造設備の利用とを比べてこう語る。<br/>「われわれはファブを持たないAMDの一事業部なんですが、他のAMD部門から受けるサービスよりも、全くの部外者であるインテル社のファブから受けるサービスのほうが多いですねえ」。<br/>この新戦略は地元新興企業の協力にもつながった。たとえばアルテラ社は、サイプレス社が運営する最先端ファブに投資することで、自分のチップ生産能力を確保することにしたのだった。</p></blockquote>
+
+
+<p>(ちなみに、この部分の前段に「ザイリニクス社」とあるがこれはXilinxのことだろうな)</p>
+
+<p>え？って感じがした。原文を見ないとよくわからない。「アルテラってAMDの一部だったの？」と「インテルがファブを外部に解放していたの？」という疑問。後で調べる。</p>
+
+<p>211ページより：アルテラのような新興企業は「ミニファブ」を使うようになったという件に続き</p>
+
+<blockquote><p>伝統的な「メガファブ」は2億5000万ドル以上して、建設に2,3年かかるが、「ミニファブ」は2000万から5000万ドルで、六ヶ月もあれば作れる。1985年になると、シリコンバレーの新興企業は一つのラインで平均して100種類から200種類の違ったチップを生産しており、その生産量は10個から10000個まで様々だった。</p></blockquote>
+
+
+<p>「ミニファブ」で検索すると、日本では2000年代に「HALCA」というプロジェクトに官民あわせて80億円投資がなされたようである。http://www.takeda-foundation.jp/reports/pdf/prj0111.pdf</p>
+
+<p>続く。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/23/g5-like-functions-in-opencl/">G5 Like Functions in OpenCL</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-23T00:00:00+09:00" pubdate data-updated="true">Mar 23<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>Phantom-GRAPE: Numerical Software Library to Accelerate Collisionless <em>N</em>-body Simulation with SIMD Instruction Set on x86 Architecture by Tanikawa, Yoshikawa, Nitadori &amp; Okamoto</h3>
+
+<p><a href="http://arxiv.org/abs/1203.4037v1">arxivのリンクはこれ</a></p>
+
+<p>AVX命令を利用して、高速にGRAPE-5相当の重力相互作用計算を行う手法についての論文が投稿された。
+我々のグループでも、2011年の卒業研究(鈴木裕太さん)で、OpenCLによる重力相互作用計算をテーマとして、
+以下のような結果が得られている。</p>
+
+<ul>
+<li>AMDのGPUでは、最新のOpenCL実装であればILと同程度の性能を得ることができる</li>
+<li>この時、一番高速になるのはfloat4を使ったベクトル化バージョンである</li>
+<li>Core i7 2600Kにおいては、AMDのSDKではfloat4を使ったベクトル化バージョンが速く、IntelのSDKでは明示的なベクトル化にはあまり効果がなく、ベクトル化せずとも同等の速度</li>
+<li>Core i7 2600Kでの性能は最大2.1 G interactions/sec (2.1e9)</li>
+</ul>
+
+
+<p>この<a href="http://galaxy.u-aizu.ac.jp/trac/note/raw-attachment/wiki/Talks/ASJ_2012_spring_pub.pdf">卒業論文の結果の一部は天文学会発表のスライドで流用</a>している。
+float4を使ったベクトル化バージョン(鈴木バージョンを中里がアップデート)は、以下のようなものになる(gist)。</p>
+
+<div><script src='https://gist.github.com/2166341.js?file='></script>
+<noscript><pre><code>#define READONLY_P const * restrict 
+
+__kernel
+void 
+grav1(
+      __global float4 READONLY_P x, 
+      __global float4 READONLY_P y, 
+      __global float4 READONLY_P z, 
+      __global float4 READONLY_P m, 
+      __global float4 *ax, 
+      __global float4 *ay, 
+      __global float4 *az, 
+      __global float4 *pt,
+      const int n, 
+      const float eps2
+      )
+{
+  unsigned int g_xid = get_global_id(0);
+  unsigned int g_yid = get_global_id(1);
+  unsigned int g_w   = get_global_size(0);
+  unsigned int gid   = g_yid*g_w + g_xid;
+  unsigned int i = gid;
+
+  float4 xi = x[i];
+  float4 yi = y[i];
+  float4 zi = z[i];
+  float4 e2 = (float4)(eps2);
+
+  float4 a_x = (float4)(0.0f);
+  float4 a_y = (float4)(0.0f);
+  float4 a_z = (float4)(0.0f);
+  float4 p_t = (float4)(0.0f);
+
+  for(unsigned int j = 0; j &lt; n/4; j++) {
+    float4 xj = x[j];
+    float4 yj = y[j];
+    float4 zj = z[j];
+    float4 mj = m[j];
+
+    for(unsigned int k = 0; k &lt; 4; k++) {
+      float4 dx, dy, dz;
+      dx = xj - xi;
+      dy = yj - yi;
+      dz = zj - zi;
+
+      float4 r2 = dx*dx + dy*dy + dz*dz + e2;
+      float4 r1i = native_rsqrt(r2);
+      float4 r2i = r1i*r1i;
+      float4 r1im = mj*r1i;
+      float4 r3im = r1im*r2i;
+
+      a_x += dx*r3im;
+      a_y += dy*r3im;
+      a_z += dz*r3im;
+      p_t += -r1im;
+
+      uint4 mask = (uint4)(3, 0, 1, 2);
+      xj = shuffle(xj, mask);
+      yj = shuffle(yj, mask);
+      zj = shuffle(zj, mask);
+      mj = shuffle(mj, mask);
+    }
+  }
+
+  ax[i] = a_x;
+  ay[i] = a_y;
+  az[i] = a_z;
+  pt[i] = p_t;
+}
+</code></pre></noscript></div>
+
+
+<p>コードを見るとわかるように、これはI粒子4個 x J粒子4個でループアンローリングするコードに相当する。
+AMDのVLIW5やVLIW4のGPUでは、この方法が一番速いと思われる。
+このコードでは共有メモリは使っていない。1行がそのためのおまじないである。今はいらないかもしれない。</p>
+
+<p>このカーネルで、改めてベンチマークを取ってみた。
+Plummer sphereを適当なステップ数だけ積分して、一秒あたりの相互作用の演算回数を計測した。</p>
+
+<p><img src="/permanent/g5_opencl_v4.png"></p>
+
+<p>GPUのほうはまだ性能がサチってはいない。
+CPUは、できるだけ谷川(2012)と同じ条件で計測してみたが、我々の環境ではHTはonになっている。
+結果、AMDのSDKを使った場合約 4 Gint/secくらいになり、Intel SDKを使った場合約 2 Gint/secくらいになった。
+谷川(2012)と比べるとほぼ2分の1の性能である。
+上に示したような単純なコードで、inline assemnlyを使ったものと比べてこれくらいの性能がでるのなら、
+案外いいともいえるし、OpenCLってやっぱり微妙だよねともいえる。</p>
+
+<p>谷川(2012)との違いは、彼らのコードはI粒子 4 個 x J粒子 2 個で計算をしていて、
+かつ、I粒子をOpenCLでいうところのfloat8変数にいれて、明示的にAVX命令を使うようにしていることである。
+こうすると、上のOpenCLコードでの&#8221;shuffle&#8221;の部分がいらない。
+実際に上のコードから生成されるx86_64のアセンブリコードを見てみると、&#8221;shuffle&#8221;の部分に結構な手間がかかっている。
+AMDのVLIW5やVLIW4のGPUでは、VLIWなのでこのようなシャッフル(正確には水平方向のシフト)は、
+読み出しレジスタのポートを変更するだけであり、特にオーバーヘッドがない。
+しかし、SSEやAVX命令には、水平方向のシフトを効率よくおこなうための命令がない(ようだ)。</p>
+
+<p>谷川(2012)と同じようなコードをOpenCLで書くことは難しくない。
+ので、やってみたのが以下の結果。</p>
+
+<p><img src="/permanent/g5_opencl_v4v2.png"></p>
+
+<p>&#8220;v4v2&#8221;というのが下に貼り付けた(gist)のコードによる結果である。
+AMDのSDKでは、このコードは非常に遅いので、結果を載せていない。
+&#8220;hint 8&#8221;とある線は、ベクトル化のヒントを与えた場合である。詳しくは省略。</p>
+
+<p>結果として、谷川(2012)と同じような実装にすると性能は大きく向上した。
+具体的にはもともと最大で約 2 Gint/secだったのが、最大で約 5.6 Gint/secになった。
+それでも、まだ彼らの結果(約 8 Gint/sec)には及んでいない。
+これ以上は命令を並び替えるなどして、レジスタの利用を最小限とするような最適化が必要だろう。
+なおIntelのSDKでは、自動ベクトル化をするため、それが悪影響を及ぼしている可能性がある。
+これは生成されたアセンブリを見ればわかるはず。というのは宿題にする。
+また、他のアーキテクチャのCPU
+(AVXをサポートしているBulldozerや、あるいはAMDのAPUやCellBE)ではどうなるかなど、
+試すべきことは色々ある。これもそのうちの宿題。</p>
+
+<p>最後に、谷川(2012)と決定的に違うのは、Nに対する立ち上がりのゆるさ。
+ここが今の結果では致命的に遅い。本当はもっと速くてもいいはずであるが。。
+でも、数時間でちょいちょいとやった割には、結構よい性能じゃないですか？</p>
+
+<p>追記：AMDのSDKの最新バージョンでも試してみた。全体的に性能が上がり、立ち上がりの問題も消えている。</p>
+
+<div><script src='https://gist.github.com/2167470.js?file='></script>
+<noscript><pre><code>__kernel
+void
+grav3(
+      __global float4 READONLY_P x,
+      __global float4 READONLY_P y,
+      __global float4 READONLY_P z,
+      __global float4 READONLY_P m,
+      __global float4 *ax,
+      __global float4 *ay,
+      __global float4 *az,
+      __global float4 *pt,
+      const int n,
+      const float eps2
+      )
+{
+  unsigned int g_xid = get_global_id(0);
+  unsigned int g_yid = get_global_id(1);
+  unsigned int g_w   = get_global_size(0);
+  unsigned int gid   = g_yid*g_w + g_xid;
+  unsigned int i = gid;
+
+  float8 xi = (float8)(x[i], x[i]);
+  float8 yi = (float8)(y[i], y[i]);
+  float8 zi = (float8)(z[i], z[i]);
+  float8 e2 = (float8)(eps2);
+
+  float8 a_x = (float8)(0.0f);
+  float8 a_y = (float8)(0.0f);
+  float8 a_z = (float8)(0.0f);
+  float8 p_t = (float8)(0.0f);
+
+  for(unsigned int j = 0; j &lt; n/4; j++) {
+    float4 xxj = x[j];
+    float4 yyj = y[j];
+    float4 zzj = z[j];
+    float4 mmj = m[j];
+
+    {
+      float8 xj = (float8)(xxj.x, xxj.x, xxj.x, xxj.x, xxj.y, xxj.y, xxj.y, xxj.y);
+      float8 yj = (float8)(yyj.x, yyj.x, yyj.x, yyj.x, yyj.y, yyj.y, yyj.y, yyj.y);
+      float8 zj = (float8)(zzj.x, zzj.x, zzj.x, zzj.x, zzj.y, zzj.y, zzj.y, zzj.y);
+      float8 mj = (float8)(mmj.x, mmj.x, mmj.x, mmj.x, mmj.y, mmj.y, mmj.y, mmj.y);
+
+      float8 dx, dy, dz;
+      dx = xj - xi;
+      dy = yj - yi;
+      dz = zj - zi;
+
+      float8 r2 = dx*dx + dy*dy + dz*dz + e2;
+      float8 r1i = native_rsqrt(r2);
+      float8 r2i = r1i*r1i;
+      float8 r1im = mj*r1i;
+      float8 r3im = r1im*r2i;
+
+      a_x += dx*r3im;
+      a_y += dy*r3im;
+      a_z += dz*r3im;
+      p_t += -r1im;
+    }
+    {
+      float8 xj = (float8)(xxj.z, xxj.z, xxj.z, xxj.z, xxj.w, xxj.w, xxj.w, xxj.w);
+      float8 yj = (float8)(yyj.z, yyj.z, yyj.z, yyj.z, yyj.w, yyj.w, yyj.w, yyj.w);
+      float8 zj = (float8)(zzj.z, zzj.z, zzj.z, zzj.z, zzj.w, zzj.w, zzj.w, zzj.w);
+      float8 mj = (float8)(mmj.z, mmj.z, mmj.z, mmj.z, mmj.w, mmj.w, mmj.w, mmj.w);
+
+      float8 dx, dy, dz;
+      dx = xj - xi;
+      dy = yj - yi;
+      dz = zj - zi;
+
+      float8 r2 = dx*dx + dy*dy + dz*dz + e2;
+      float8 r1i = native_rsqrt(r2);
+      float8 r2i = r1i*r1i;
+      float8 r1im = mj*r1i;
+      float8 r3im = r1im*r2i;
+
+      a_x += dx*r3im;
+      a_y += dy*r3im;
+      a_z += dz*r3im;
+      p_t += -r1im;
+    }
+  }
+
+  ax[i] = a_x.s0 + a_x.s4;
+  ay[i] = a_y.s0 + a_y.s4;
+  az[i] = a_z.s0 + a_z.s4;
+  pt[i] = p_t.s0 + p_t.s4;
+}
+</code></pre></noscript></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/16/more-note-on-parallel-octree/">More Note on Parallel Octree</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-16T00:00:00+09:00" pubdate data-updated="true">Mar 16<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ツリー法に関する論文のメモ。</p>
+
+<h3>Implications of hierarchical N-body methods for multiprocessor architectures by J.P.Singh, J.L.Hennessy &amp; A.Guputa (1995)</h3>
+
+<p><a href="http://dx.doi.org/10.1145/201045.201050">doiのリンクはこれ</a>だが、検索するとPDFへのリンクがあった。</p>
+
+<p>これは第一著者であるSinghの博士論文 &#8220;Parallel hierarchical N-body methods and their implications for multiprocessors&#8221;
+(Doctoral Dissertation, Stanford Univesity, 1993)を投稿したものと思われる。</p>
+
+<p>すごく長い。以下、Section 9のメモを。</p>
+
+<p>ここでは、SalmonのLETを使ったツリー法について色々と議論している。
+論調は、LETとメッセージパッシングは使えねー、ってこと。
+ただし、これは90年代前半の仕事なので、今とは対象としている問題のサイズが圧倒的に小さい。
+この部分である意味かなりdisられている、Salmonの結果でも512プロセッサで10万粒子とからしい。</p>
+
+<p>ちょっとおもしろかったので引用。</p>
+
+<blockquote><p>The difference is also demonstrated by our experience with having groups of graduate students implement the application on SAS-CC and message-passing machines, in a ten-week parallel programming project course at Stanford University. The SAS versions were produced very quickly, and yield very good speedups on the DASH multiprocessor. A message-passing version, however, is yet to be completed within the time allotted for the project</p></blockquote>
+
+
+<p>この部分の前に、Salmonの提案によるMPを使ったLETのツリー法は、
+SASでの実装より数倍時間がかかったと書いてある(誰が？)。
+その上で、ツリー法の実装をStanfordの大学院生に10週のプロジェクトとしてやらせてみたら、
+共有メモリ(SAS-CC)とMessage-paasing(MP)の生産性の「違い」が示されたという。
+SAS-CCとはshared address space-cache coherentの略。著者らはSAS-CCな計算を推しているのは言うまでもない。</p>
+
+<p>まず、LETではメモリ使用量が非常に多くなる。
+これはLETでは保守的にTreeを構築するので、
+結果的には無駄な粒子とノードをLETに追加してしまうため。
+よって、メモリ利用量も多いし、そのためのデータの交換に必要なデータ量も多いし、
+それを実現するためのプログラミングも非常に複雑になる。ボロクソである。</p>
+
+<p>一方SAS-CCでのツリーの実装では、データ交換は暗黙的のためプログラミングが簡単であり、
+また、本当に必要最低限のデータ交換しか発生しない。
+それは、SASでの実装では、LETを構築するのではなく、一つの共有されたtreeを実装するためで、
+&#8220;Costzone&#8221;と呼ばれるロードバランスの手法と対になっている。
+利用するメモリ量は、シリアルのコードとほとんど変わらない程度になる(はずである)。
+ただし、彼らが議論している粒子数はたかだか16000粒子程度であり(Table 2参照)、
+それのための必要なキャッシュ量は16KBとあり、現代には通用しない。
+そもそも、現在でも128プロセッサを超えるような共有メモリ機を、
+ハード的に実現するのは現実的には非常に難しい(性能が出ない)。</p>
+
+<p>それでも、無理やり彼らの結論を敷衍すると、ハード的に共有メモリを実現することは難しくても、
+N-bodyに専用の共有メモリフレームワークを改めて考えて、
+まともに実装することには意味があるかもしれない、ということになる。
+実際、彼らは仮想ポインタを利用したツリーの実装と、
+ハッシュ値を使ったツリーの実装があり得ると提案していて、
+これらはある種N-Bodyのための共有メモリフレームワークになっている。
+脚注には、ハッシュ値を使ったツリーの実装を「この論文」を書いている時に、
+Salmonらがおこなっているとある。
+これはHashed Oct-treeと呼ばれるSalmonらの1993年の仕事である。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/10/note-on-opencl-sdks/">Note on OpenCL SDKs</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-10T00:00:00+09:00" pubdate data-updated="true">Mar 10<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>ICDとその設定について</h2>
+
+<p>OpenCLには、SDKを実行時に切り替えることのできる、Installable Client Driver (ICD) Loaderという仕組みがある。
+コンパイル時にリンクされる&#8221;libOpenCL.so&#8221;には、エントリーポイントのみがあり、
+ICDによって各SDKのライブラリ実体が動的にリンクされる。
+そのため、ランタイムは実体ライブラリをサーチするパスを&#8221;/etc/OpenCL/vendors&#8221;から読み込む。
+ここに、ライブラリへのパスを書いただけのファイルを置いておけばいい。
+下記のSDKのどれか(Appleは異なる)をインストールすると、
+&#8220;/etc/OpenCL/vendors/amdocl64.icd&#8221;などのファイルが作られる。</p>
+
+<p>root権限がある場合には何も考えずに指示どおりにSDKをインストールすればよいのだが、
+そうもいかない場合には、ホームディレクトリ等にもSDKをインストールすることもできる。
+この場合、ICDの設定ディレクトリのは以下の環境変数で設定すればよい。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>OPENCL_VENDOR_PATH=$(HOME)/lib/OpenCL</span></code></pre></td></tr></table></div></figure>
+
+
+<p>AMD, Intel, NvidiaのSDKはこの方法で動作することを確認している。
+IntelのSDKだけは、ここにあるファイルにfullpathを書かないとだめ。</p>
+
+<h2>2012年3月の各社のOpenCL SDKの現状</h2>
+
+<p>自分で試したSDKのみ。五十音順。</p>
+
+<h3>AMD</h3>
+
+<p>最新バージョンは<a href="http://developer.amd.com/sdks/AMDAPPSDK/Pages/default.aspx">AMD APP 2.6</a>である。
+AMDのSDK6c6c6c6cは、OpenCLのバックエンドがCatalystというGPU用のデバイスドライバに分離されている。
+そのため、SDKのバックエンドと、ある時点での最新のバックエンドには、結構なリビジョンの差がある。
+GPUのバックエンドは当然Catalyst付属のものが新しい。CPUのバックエンドは。。。(調査中)</p>
+
+<p>AMDのSDKは、CPUとGPUをどちらもサポートしていて、CPUの種類にも特に制限はない。　</p>
+
+<h3>Apple</h3>
+
+<p>Lion以降のOS XにはOpenCLの開発環境が含まれている。
+利用するにはXcodeのインストールも必要だろう。
+AppleのSDKは、ヘッダの位置とライブラリをリンクする方法が特殊。例えば以下のように。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gcc main.c -framework OpenCL</span></code></pre></td></tr></table></div></figure>
+
+
+<p>AppleのSDKは、CPUとGPUをどちらもサポートしている。
+手元には、2010年のMac Book Airしかないので、パフォーマンスについては不明。
+あまり速くないような感じ。　</p>
+
+<h3>Intel</h3>
+
+<p>最新バージョンは<a href="http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/">1.5</a>である。
+現バージョンはCPUのみサポート。将来はIGPをサポートするらしい。
+IntelのSDKの困ったところは、CPUでSSE3命令(以降)をサポートしていないと動作しないということ。
+そのため、AMDのプロセッサではBulldozer以降のアーキテクチャでないと動作しない。
+また、IntelのCPUで、アーキテクチャ的にはSSE3命令をサポートしていても、
+Linuxのカーネルが古くて、SSE3以降の命令を認識しない場合動作しない。</p>
+
+<p>自動ベクトル化をしてくれるのが売り。</p>
+
+<h3>NVIDIA</h3>
+
+<p>NVIDIAのSDKはCUDAのSDKに含まれている。リンクするライブラリの実体も&#8221;libcuda.so&#8221;だったりする。
+NVIDIAのSDKはNVIDIAのGPUのみサポートしている。</p>
+
+<p>現時点での問題は、Fermiアーキテクチャでの共有メモリの設定である。
+Fermiでは、共有メモリと1st cacheの容量が調整可能になっていて、
+それぞれの容量を48/16KB or 16/48KBと切り替えることができる。
+CUDAではコンパイルオプションで切り替えることができるようであるが、OpenCLではそのやり方がいまだ不明である。</p>
+
+<p>CUDAとOpenCLの間には性能に差がある、というのが定説的な感じであるが、
+最近はギャップが小さくなってきてるようである。
+例えば
+<a href="http://www.cc.gatech.edu/~vetter/keeneland/tutorial-2012-02-20/13-shoc.pdf">Keeneland Workshop at GTのこのスライド</a>
+で、色々なカーネルをCUDAとOpenCLで実装して性能比較している。
+一部のカーネルを除いて、性能差はなくなってきている。
+上記、共有メモリと1st cacheの容量変更ができるようになれば、さらに差はなくなるはずである。　</p>
+
+<h2>OpenCLの本</h2>
+
+<p><a href="http://www.amazon.co.jp/dp/484432814X/">OpenCL入門 - マルチコアCPU・GPUのための並列プログラミング</a>は、学生用に買った日本語の本。既に少し古いが、もうじき新版が発売される。</p>
+
+<p><a href="http://www.amazon.co.jp/dp/1617290173">OpenCL in Action: How to Accelerate Graphics and Computations</a>は、SC11に行った時に、どっかのブースで展示してあった。その場で買うつもりが、気づいたら売り切れていたので、帰国後注文した。cl.hppの使い方はこれで学んだ。わかりやすい。</p>
+
+<p><a href="http://www.amazon.co.jp/dp/0123877660/">Heterogeneous Computing with OpenCL</a>は、買ったばかり。著者はAMDの人達で、AMDのGPUアーキテクチャについての解説がChapter 6にあるのが珍しいかも。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/09/first-post/">ファーストポスト</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T00:00:00+09:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>テスト的な投稿</h2>
+
+<p><a href="http://www.cs.berkeley.edu/~wkahan/ieee754status/754story.html">IEEE 754規格についてのインタビュー記事</a></p>
+
+<blockquote><p>But DEC&#8217;s original double precision `D&#8217; format had the same eight exponent bits as had its single precision `F&#8217; format. This exponent range had turned out too narrow for some double precision computations. DEC reacted by introducing its `G&#8217; double precision format with an 11 bit exponent that had served well enough in CDC&#8217;s 6600/7600 machines for over a decade; K-C-S had chosen that exponent range too for its double precision.</p></blockquote>
+
+
+<p>&#8220;K-C-S&#8221;とは最終的に754規格として採用されたもののドラフト。</p>
+
+<h2>コードのはりつけ</h2>
+
+<p>codeblcok</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/zsh
+</span><span class='line'>echo "$(pwd -P)/intel/libintelocl.so" >| OpenCL/intelocl64.icd</span></code></pre></td></tr></table></div></figure>
+
+
+<p>backtick</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/zsh
+</span><span class='line'>echo "$(pwd -P)/intel/libintelocl.so" &gt;| OpenCL/intelocl64.icd</span></code></pre></td></tr></table></div></figure>
+
+
+<p>どっちも同じか。</p>
+
+<h2>OpenCLでのBulldozer(8 core)とSandybridge(6 core)の性能比較</h2>
+
+<p>AMDとIntelのSDKをそれぞれのCPUで比較した。
+BulldozerはFX-8150(8 core)。SandybridgeはCore i7 3960X(6 core)。</p>
+
+<p><img src="http://galaxy.u-aizu.ac.jp/permanent/SPH_SB_BD_Tahiti.png"></p>
+
+<ul>
+<li>BulldozerではAMDのSDKのほうが速い</li>
+<li>SandybridgeではIntelのSDKのほうが速い</li>
+<li>Tahiti最強</li>
+</ul>
+
+
+<h2>markdownの概略</h2>
+
+<p><a href="http://ja.wikipedia.org/wiki/Markdown">http://ja.wikipedia.org/wiki/Markdown</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/28/us-national-labs-and-supercomputing/">US National Labs and Supercomputing</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-28T00:00:00+09:00" pubdate data-updated="true">Feb 28<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>The Influence of the Los Alamos and Livermore National Laboratories on the Development of Supercomputing by Mackenzie (1991)</h3>
+
+<p><a href="http://dx.doi.org/10.1109/MAHC.1991.10014">doiのリンクはこれ</a>。</p>
+
+<p>を読みながらのメモ。以下、論文からの引用とコメント：</p>
+
+<blockquote><p>The failure of suppliers to produce the required integrated circuits, anti-war demonstrations, riots, and fire bombing on the campus of the University of Illinois in 1970, and a range of other circumstances prevented the smooth development of ILLIAC IV.</p></blockquote>
+
+
+<p>ILLIAC IVについて。</p>
+
+<blockquote><p>The requisite calculations for one time-step for one cell might amount to 200 floating-point operations for the early 1960’s code, and 20,000 for the modern one (Livermore interviews).</p></blockquote>
+
+
+<p>核兵器のモデリングに必要な演算量について。この間に、モデルに利用されるメッシュも、2次元モデルから3次元モデルが必要になり、大幅に増加している。</p>
+
+<blockquote><p>Statically, up to 30% of the instructions in a Monte Carlo program may be branches (Michael interview).</p></blockquote>
+
+
+<p>メッシュ上で偏微分方程式の解を求める手法は、コードに分岐が少ないのに対して、核兵器モデリングでもうひとつ重要な計算手法であるモンテカルロ法は、本質的に分岐が多い。</p>
+
+<blockquote><p>One million IBM cards carried the requisite initial values, one card for each point in the computational mesh, and “the computations to be performed required the punching of intermediate output cards which were then resubmitted as input” (Stern 1981).</p></blockquote>
+
+
+<p>Los AlamosのFrankelとMetropolisが、最初にENIACで計算をしたモデルのこと。</p>
+
+<blockquote><p>Neither laboratory has bought one of the Japanese supercomputers, though here questions of nationalist protectionism come into play as well as the questions of the suitability of particular machines for the laboratories’ computational tasks.</p></blockquote>
+
+
+<p>Los AlamosとLivermoreは、スパコンの選択にうるさい。速いモデルだからという理由だけで計算機を選ぶことはなかった。当然、日本製のベクトルスパコンは選択されなかった。</p>
+
+<blockquote><p>The Control Data STAR-100 episode was pivotal, because it secured the commitment of the laboratories to mainstream supercomputing rather than the more massively parallel alternatives.</p></blockquote>
+
+
+<p>STAR-100というある意味画期的な計算機は、仕様を満たすことができなかったため、その後LAやLLNLはいわゆる普通の計算機(CDC Cyber205などのベクトル計算機)に強くコミットすることになった。実はこれらの核関連の研究は多くが機密であったため、本当に必要な「核」の部分のコードが公開されず、それをターゲットとしてのアーキテクチャやソフトの最適化が不可能という問題もあったようだ。そのため、LLNLではLivermore Loopsと呼ばれる、LLNLが必要としている計算の典型的なものを代表するベンチマークを用意するようになった。その後、色々な計算機はこの「ベンチマーク」の性能を競う風潮ができた。</p>
+
+<blockquote><p>The project was formulated in an “almost pathological atmosphere of optimism and its corollary, fear of being left behind” (Bashe et al. 1986); as outlined above, the designers were also trying to satisfy the needs of quite different kinds of users.</p></blockquote>
+
+
+<p>IBMのStretchについて。結果としてStretchは735個の命令をもつ計算機になってしまった。この直前に「VAXのアーキテクチャはDEC社内の官僚主義的な構造を反映している」というTom Westの言葉を、&#8221;The Soul of a New Machine&#8221;から引用している。IBMも同様の問題を抱えていたのだろう。</p>
+
+<blockquote><p>Livermore’s “Sidney Fernbach was reportedly one of the few people in the world from whom Seymour Cray would accept suggestions” (Lundstrom 1987, p. 90), and Cray took, and takes, care to become aware of the laboratories’ computational needs.</p></blockquote>
+
+
+<p>Cray-1は、LAやLLNLの要求にもとづいて設計された計算機ではなかった。実際、Crayは彼らのような核関連の研究だけでなく、NSAが必要としている計算にも配慮して、ある種のバランスのとれたアーキテクチャを開発することができて、そして成功した(Cray-1では)。それでも、この引用にあるように、LLNLによるCrayに対する影響が全くなかったわけではないらしい。&#8221;one of the few people&#8221;ねぇ。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/27/cray-and-supercomputers/">Cray and Supercomputers</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-27T00:00:00+09:00" pubdate data-updated="true">Feb 27<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>The social limits of speed: development and use of supercomputers&#8221; by Elzen &amp; Mackenzie (1994)</h3>
+
+<p><a href="http://dx.doi.org/10.1109/85.251854">doiのリンクはこれ</a>。</p>
+
+<p>以下、論文からの引用とコメント：</p>
+
+<blockquote><p>As one of Cray&#8217;s famous maxims has it, he likes to start the design of a new-generation machine with &#8220;a clean sheet of paper.&#8221;</p></blockquote>
+
+
+<p>CDC6600の成功後、次の計算機の設計方針についてのCrayの見解。
+Crayは過去のアーキテクチャとの互換は最重要視していなかった。
+結果的に、CrayはCDCの方針に反対し、CDCを退社してCRIを設立した。</p>
+
+<blockquote><p>Cray used to say that he knew all his users by their first names.</p></blockquote>
+
+
+<p>Crayは常に利用者(この場合アメリカの国立研究所の核関連の研究者達)のことを第一に考えて計算機を設計したらしい。</p>
+
+<blockquote><p>This was recognized even by IBM, prompting a famous acerbic memo to his staff from chairman Thomas J. Watson, Jr., inquiring why Cray&#8217;s team of &#8220;34 people &#8211; including the janitor&#8221; had outperformed the computing industry&#8217;s mightiest corporation.</p></blockquote>
+
+
+<p>CDC6600が発売されたあとの当時のIBMのトップのメモ。&#8221;janitor&#8221;は守衛。</p>
+
+<blockquote><p>In 1980, it was unclear that the 200 kilowatts that were generated in such a small and densely packed computer could be dissipated.</p></blockquote>
+
+
+<p>3D基板で実装されたCray-2をどう冷却するのかという問題。結局フッ化炭素(液体)を使って冷却することになった。</p>
+
+<blockquote><p>In a sense, CRI gradually became the &#8220;prisoner of its own success.&#8221; New innovations were constrained by the very socio-technical network that made CRI so successful.</p></blockquote>
+
+
+<p>これがこの論文の核心だろう。
+元々、CRIは、CrayがCDCの開発方針を受け入れることができず独立して設立した会社で、
+その目的はCrayの好きなように世界最速の計算機を作ることだった。
+Cray-1はそのもくろみ通りに、当時の世界最高速を実現した。
+一方でCRIは売り上げを伸ばすために、伝統的な顧客であった国立研究所以外にも、
+民間の会社への営業をするようになった。
+このときに&#8221;Hero-problems&#8221;という、その業界で重要な問題だが時間がかりすぎる問題を、
+CRIなら自社の計算機を使って高速化できる、というのを売りとして営業をした。
+色々と曲折はあったが、この戦略は成功し、民間のいろいろな大企業がCRIの計算機を導入した。
+その結果、それらの新しい顧客は必ずしも世界最速の計算機を求めているのではなく、
+ソフトウエア資産が継続的に利用可能かどうかや計算機の信頼性に重きをおいたため、
+CRIは、新しい世代の計算機のたびにアーキテクチャを一新するという、
+創業者のCray的なやりかたをとることが不可能になった。
+つまり、CRIは顧客の要望に基づいてハードとソフトを開発するようになったために、
+顧客はCRIのシステムに依存し、CRIはその呪縛から逃れることが不可能になった。これが90年代前半の状況。</p>
+
+<p>&#8220;socio-technical network&#8221;とは、Crayとそのスパコンの利用者たちの関係性という意味での人間関係のつながりの意味と、
+上に書いたようなCRIの計算機とその顧客たちのとの強い関係性、
+さらにその影響下にある計算機のアーキテクチャやそのための
+ソフトウエア(OSやコンパイラ、ライブラリ、アプリまで)などの技術的な関係性、以上を総称した概念。
+技術的に世界最高速を目指すという、古き良きCrayら開拓者たちによるラディカルな計算機開発の時代は、
+技術的ではない制約を受けるようになり、1980年代の終わり頃には終焉しつつあった。
+それらの制約を避けて、新たな計算機を開発するには、
+CrayやSteve Chen(Cray Y-MPのアーキテクト)のように、CRIを退職して再び自分の会社を立ち上げるしかない。
+しかし、それが成功するかは別問題で、実際その二人の新しい計算機は失敗している。</p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
     <a href="/blog/archives">Blog Archives</a>
@@ -77,9 +1246,74 @@
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
     
+      <li class="post">
+        <a href="/blog/2012/06/19/top500-and-intel-phi/">TOP500 and Intel Phi</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/10/gpu-instruction-mix/">GPU Instruction Mix</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/11/gnuplot-on-ubuntu-10-dot-04/">gnuplot on Ubuntu 10.04</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/28/note-on-regional-advantage/">Note on Regional Advantage</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/23/g5-like-functions-in-opencl/">G5 like functions in OpenCL</a>
+      </li>
+    
   </ul>
 </section>
 
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("dadeba", 5, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/dadeba" class="twitter-follow-button" data-show-count="true">Follow @dadeba</a>
+  
+</section>
+
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/dadeba">@dadeba</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'dadeba',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
 
 
 
@@ -91,7 +1325,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - Your Name -
+  Copyright &copy; 2012 - N.Nakasato -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
@@ -101,6 +1335,14 @@
 
 
 
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
 
 
 
