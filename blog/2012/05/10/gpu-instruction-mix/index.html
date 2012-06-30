@@ -1,0 +1,405 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>GPU Instruction Mix - メモ</title>
+  <meta name="author" content="N.Nakasato">
+
+  
+  <meta name="description" content="&#8220;A parallel hashed Oct-Tree N-body algorithm&#8221; (http://dl.acm.org/citation.cfm?id=169640) を論文セミナーで学生に紹介してもらった。案外細部は覚えていないもので、発見があった。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://dadeba.github.com/blog/2012/05/10/gpu-instruction-mix">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="メモ" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">メモ</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:dadeba.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">GPU Instruction Mix</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-10T09:44:00+09:00" pubdate data-updated="true">May 10<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>&#8220;A parallel hashed Oct-Tree N-body algorithm&#8221; (<a href="http://dl.acm.org/citation.cfm?id=169640">http://dl.acm.org/citation.cfm?id=169640</a>) を論文セミナーで学生に紹介してもらった。案外細部は覚えていないもので、発見があった。</p>
+
+<p>この論文は並列ツリーコードの新しいアルゴリズムを提案し、Intel Touchstone Deltaでの性能評価を報告した論文である。SC&#8217;93で発表された。512プロセッサで、Cold Dark Matterモデルを計算した場合の実効性能は5 - 6 GFLOPSとなった。</p>
+
+<p>Seciton 4の最後の部分：</p>
+
+<blockquote><p>If we count only the floating point operations performed in the force calculation routine as “useful work” (30 flops per interaction) the overall speed of the code is about 5-6 Gflops. However, this number is in a sense unfair to the overall algorithm, since the majority of the code is not involved in floating point operations at all, but with tree traversal and data structure manipulation. The integer arithmetic and addressing speed of the processor areas impoctant as the floating point performance. We hope that in the future, evaluation of processors does not become overbalanced toward better floating point speed at the expense of integer arithmetic and memory bandwidth, as this code is a good example of why a balanced processor architecture is necessary for good overall performance.</p></blockquote>
+
+
+<p>この実効性能は、ツリー法で計算した粒子相互作用の浮動小数点演算数のみをカウントした場合である。単純に粒子相互作用だけを計算した場合の性能は14 GFLOPSくらいになるのに対して、実効性能はそれの30％しかない。その理由は、粒子間相互作用以外にも、まずツリーを構築する時間が必要で、さらにツリーをたどる時間やプロセッサ間通信のためにも時間がかかるためである。そのため、引用部に書いてある通り、浮動小数点演算性能だけでなく、主にアドレス計算に使われる整数演算や、このツリーアルゴリズムの場合にはshiftや論理積のような演算の性能もcriticalになってくる。</p>
+
+<h2>Instruction Mixの実際</h2>
+
+<p>では最近のGPUで似たような計算をやるとどうなるのか。直接的な結果はさておき、浮動小数点演算数とその他の命令の割合を調べてみた。これはInstructin Mixと呼ばれている。ツリーをたどりながら重力を計算するkernelをOpenCLで実装し、様々な命令の割合を調べてみた。ターゲットはSourthern IslandアーキテクチャのRadeon HD7970である。</p>
+
+<h4>VL=1</h4>
+
+<table>
+<thead>
+<tr>
+<th>命令種類 </th>
+<th> 命令数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮動小数点演算 </td>
+<td> 25</td>
+</tr>
+<tr>
+<td>整数演算       </td>
+<td> 60</td>
+</tr>
+<tr>
+<td>load/store等   </td>
+<td> 42</td>
+</tr>
+<tr>
+<td>合計           </td>
+<td> 129</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>VL=2</h4>
+
+<table>
+<thead>
+<tr>
+<th>命令種類 </th>
+<th> 命令数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮動小数点演算 </td>
+<td> 50</td>
+</tr>
+<tr>
+<td>整数演算       </td>
+<td> 76</td>
+</tr>
+<tr>
+<td>load/store等   </td>
+<td> 52</td>
+</tr>
+<tr>
+<td>合計           </td>
+<td> 172</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>VL=4</h4>
+
+<table>
+<thead>
+<tr>
+<th>命令種類 </th>
+<th> 命令数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮動小数点演算 </td>
+<td> 100</td>
+</tr>
+<tr>
+<td>整数演算       </td>
+<td> 104 </td>
+</tr>
+<tr>
+<td>load/store等   </td>
+<td> 72</td>
+</tr>
+<tr>
+<td>合計           </td>
+<td> 252</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>VL=8</h4>
+
+<table>
+<thead>
+<tr>
+<th>命令種類 </th>
+<th> 命令数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浮動小数点演算 </td>
+<td> 128</td>
+</tr>
+<tr>
+<td>整数演算       </td>
+<td> 146</td>
+</tr>
+<tr>
+<td>load/store等   </td>
+<td> 113</td>
+</tr>
+<tr>
+<td>合計           </td>
+<td> 331</td>
+</tr>
+</tbody>
+</table>
+
+
+<h2>考察</h2>
+
+<p>このカーネルは単精度演算を使っているので、浮動小数点演算は命令のpostfixが&#8221;f32&#8221;のものを指す。整数演算は&#8221;i32&#8221;, &#8220;b32&#8221;, &#8220;b64&#8221;等のpostfixの命令。load/store等は、文字通りのloadとstore命令に加えて、&#8221;mov&#8221;のpostfixがついている、レジスタ間コピー命令等を含む。一部命令の数え方が重複しているので、総和が合計には一致しないことに注意。</p>
+
+<p>&#8220;VL&#8221;はkernelのベクトル化率。大きくすれば、ロード当たりの演算数が増えるが、レジスタ利用量が増える。実験によると最適なのはVL=4 or 8である。浮動小数点の割合は50％を下回っており、VL=1,2,4,8の時それぞれ、19.4％、29.1％、39.7％、38.7％になった。実験してみるとVL=4とVL=8ではあまり性能が変わらない。これは単に命令の種類ごとに数を数えているだけであり、分岐やループを考慮していないので、実際に実行される命令ごとの割合を調べると多少は違いがあるだろう。が、傾向としては、割合明確であった。WS93論文でもは実効性能が理論性能の30％程度である。彼らも詳細は異なるが、ここでいうベクトル化に相当することをしている。一方GPUでのツリーコードの実効性能は30命令換算ではVL=4の時に300 GFLOPS程度になる(ツリー構築やGPUとのI/Oの時間を含んだ換算)。7970の理論性能はFMA命令を使う場合は3.7 TFLOPSである。WS93の時代はFMA命令はなかったので、そこを考慮すると、我々の実効性能は16％くらいになる。分岐命令に弱いというGPUアーキテクチャではあるが、あまりかけ離れた数字ではない。汎用プロセッサでも分岐命令はそれなりのオーバーヘッドになるので、そんなもんかも。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">N.Nakasato</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-10T09:44:00+09:00" pubdate data-updated="true">May 10<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://dadeba.github.com/blog/2012/05/10/gpu-instruction-mix/" data-via="dadeba" data-counturl="http://dadeba.github.com/blog/2012/05/10/gpu-instruction-mix/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/11/gnuplot-on-ubuntu-10-dot-04/" title="Previous Post: gnuplot on Ubuntu 10.04">&laquo; gnuplot on Ubuntu 10.04</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/06/19/top500-and-intel-phi/" title="Next Post: TOP500 and Intel Phi">TOP500 and Intel Phi &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/06/19/top500-and-intel-phi/">TOP500 and Intel Phi</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/10/gpu-instruction-mix/">GPU Instruction Mix</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/11/gnuplot-on-ubuntu-10-dot-04/">gnuplot on Ubuntu 10.04</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/28/note-on-regional-advantage/">Note on Regional Advantage</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/23/g5-like-functions-in-opencl/">G5 like functions in OpenCL</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("dadeba", 5, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/dadeba" class="twitter-follow-button" data-show-count="true">Follow @dadeba</a>
+  
+</section>
+
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/dadeba">@dadeba</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'dadeba',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - N.Nakasato -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

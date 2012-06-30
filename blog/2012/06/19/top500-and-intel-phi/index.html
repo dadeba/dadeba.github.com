@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>TOP500 and Intel Phi - メモ</title>
+  <meta name="author" content="N.Nakasato">
+
+  
+  <meta name="description" content="2012年6月18日に、High Perfomance Linpackの実行によるベンチマークランキングのtop500の最新結果が発表された。 150位の「Discovery」というシステムは、IntelのGPUみたいなものIntel Xeon Phi(Intel MIC) &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://dadeba.github.com/blog/2012/06/19/top500-and-intel-phi">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="メモ" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">メモ</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:dadeba.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">TOP500 and Intel Phi</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-19T22:55:00+09:00" pubdate data-updated="true">Jun 19<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>2012年6月18日に、High Perfomance Linpackの実行によるベンチマークランキングのtop500の最新結果が発表された。</p>
+
+<p>150位の「Discovery」というシステムは、IntelのGPUみたいなものIntel Xeon Phi(Intel MIC)のボードを利用したクラスターである。</p>
+
+<p>このシステムでは、CPUとして「Xeon E5-2670 8C 2.600GHz」を利用し、アクセラレータとして「Intel MIC」を使い、
+インターコネクトは「Infiniband FDR」を採用している。利用されている総コア数は9800個であり、
+アクセラレータ部分のコア数は7560個であった。よって、CPUの総コア数は2240個であり、E5-2670は全部で280個になる。
+7560は280で割り切ることができて27が答えである。
+コア数としてわざわざ奇数を採用することはあまりなさそうなので、
+「Intel Xeon Phi」のコア数は54なのだと思われる。</p>
+
+<p>「Xeon E5-2670 8C 2.600GHz」の倍精度演算演算性能は166.4 GFLOPS (AVX命令でfaddとfmulを同時実行時)であるから、
+CPU部分のRpeak(ピーク性能)は46.592 TFLOPSである。
+一方、「Discovery」のRpeakは公表されたテーブルによると180.992 TFLOPSであった。
+これから「Intel Xeon Phi」部分のRpeakは134.4 TFLOPSという計算になる。
+全部で140ボードを仮定すると、このRpeak値から計算したボードあたりの性能は0.96 TFLOPSになる。
+54コアだと思うと、1コアあたりでは17.8 GFLOPSという換算となる。
+これまで公表されたアーキテクチャの情報によれば、「Intel Xeon Phi」のコアにおける倍精度浮動小数点演算器は、
+ベクトル長が8のSIMD演算器ということなので、1クロックあたりの演算数は16演算(Intel E5の2倍)である。
+演算性能をクロックに換算すると約1113 MHzとなる。
+結果、2個のE-2670と1個のPhiを組み合わせたノードのRpeakは1.1264 TFLOPSである。</p>
+
+<p><a href="http://newsroom.intel.com/community/intel_newsroom/blog/2012/06/17/latest-intel-xeon-processors-e5-product-family-achieves-fastest-adoption-of-new-technology-on-top500-list">この</a>
+プレスリリースをよく読むと、今回の結果はPhi 1個で1 TFLOPSを超えたとは書いてはいなくて、
+あくまでも「ノードあたり1 TFLOPS超」とあるので、つじつまはあっている。
+「Intel Xeon Phi」は、Intelの22nmプロセスを使い、3D Tri-gateトラジスタにより製造されているそうである。
+同じプロセスとテクノロジーは、最近発表されたIvy Bridgeアーキテクチャのプロセッサでも採用されている。
+その中でも、現時点で最も高速なプロセッサは「Xeon E3 1290 v2」と呼ばれている1P Server用のもので、
+3.7/4.1 GHzで動作する。後者はターボ時の動作周波数である。</p>
+
+<p>Phiのオンチップネットワークの情報は公開されていないが、仮にmeshのようなものだとすると、
+54コアはいかにもおかしく、実際には64コアである可能性がある。
+つまり、歩留まりをあげるためか、消費電力を下げるために、全てのコアがアクティブされてないのだろう。
+というのも、プレスリリースにあるように、2011年秋のデモンストレーションでは、
+1ボードあたりではじめて倍精度演算1 TFLOPSを達成した、とあるからである。
+クロック周波数固定でスケーリングすれば、1.138 TFLOPSとなり、これまたつじつまはあいそうである。
+ただし、このデモンストレーションは、SC11の会場で展示などがされていたわけではなく、
+実際には公開されていなかったはずで、プレスだけに見せられたようであった。</p>
+
+<p>すでに手に入るAMDのハイエンドGPUアーキテクチャTahitiは、
+クロックあたり512回の倍精度FMA演算が可能であり、
+リファレンス周波数の925 MHzでの性能は0.947 TFLOPSであった。
+偶然ながらPhiとあまり変わらない性能になっている。
+しかし、TahitiはTSMCの28 nmバルクプロセスで製造されており、Intelの22nmかつ3Dトランジスタと比べると、
+相当不利なはずだが、一方で、Phiのコアはx86_64命令を実行可能であり、しかもオンチップネットワークがmeshなら、
+Tahitiのツリー型のネットワーク(非常におおざっぱにいった場合)とくらべると、
+リソースが厳しいのかもしれない。
+どちらも外部メモリインターフェイスはGDDR5で、Tahitiはリファレンスボードでは3 GB、
+Phiはプレスリリースによると最低8 GBのメモリをもつとのこと。
+Tahitiのメモリインターフェイス幅は384 bitで、6 chのメモリコントローラを持つ。
+これから想像すると、Phiは4 or 8 chのメモリコントローラを持つはずである。
+GDDR5は規格上、データ転送にはエラー検出機構があり、
+エラーがあった場合再送が発生するそうである(この部分伝聞。規格書をあたったわけではない)。
+つまり、GDDR5を採用した時点で、メモリ転送自体はエラーからプロテクトされている
+(外部メモリ自体がECCに対応しているのかどうかとは独立)。
+最近のハイエンドGPUはTahitiに限らず、内部にレジスタとキャッシュとして大量のSRAMがあり、
+これらはTahitiの場合は、噂によると、ECCで保護されている。
+一方、サーバ用ではないx86プロセッサは、
+通常プロセッサ内部メモリにECC機構がないが、Phiもそのような設計なのかは不明である。
+「Xeon」というブランドをつけたと言うことは、
+ある程度のRAS機能をサポートしていることを示唆しているのかもしれない。</p>
+
+<p>「Discovery」のHPL性能について。システムのRmaxは118.6 TFLOPSであり、Rmax/Rpeakは65.53％であった。
+報告されている消費電力は100.8 kWであり、電力あたりの性能は1.177 GFLOPS/Wとなり、
+同じE5のCPUとNVIDIA M2090を利用したシステムと同程度である。
+例えば筑波大学のHA-PACSベースクラスタ(41位)は、
+ノードのCPUは「Discovery」と同じで、M2090はノードあたり4枚、インターコネクトはInifiniband QDRが2本(64 Gbps)であるが、
+1.035 GFLOPS/Wの性能であった(Rmax/Rpeakは54.18％)。
+おおざっぱには、NVIDIA M2050などを利用した他のクラスタも似たり寄ったりの性能と効率である。
+Rmax/Rpeak比を比較すると、「Discovery」はHA-PACSよりもかなりよい。
+これが意味することは、M2050/M2090では単体でのRmax/Rpeak比はたかだか60％であるから、
+Phi単体のRmax/Rpeak比は65％を大きく上回っていることである。
+なお、Xeon E5のみからなるシステムのRmax/Rpeak比は、
+例えば4位の「SuperMUC」の場合90.96％である。
+Phi単体のRmax/Rpeak比もこれに近い値かもしれない。
+ただし、アクセラレータを利用する　HPLでは、アクセラレータはDGEMMのみに利用する。
+HPLはDGEMMの演算部分が非常に大きい割合ではあるが、
+実際にはDGEMM意外にも色々な計算があり、DGEMMが高速であればあるほど、
+それ以外の部分の最適化がキーとなる。
+これは、ベクトル計算機の最適化と同じく、ベクトル化(アクセラレータ利用部分)率をできるだけ向上させることに相当するが、
+昔のベクトル計算機との違いは、比喩としてのベクトル演算性能(アクセラレータ部分の性能)と、
+比喩としてのスカラー演算性能(CPU部分の性能)の比率が、拮抗していることである。
+「Discovery」の場合は約６：１になっている。
+CPUのみからなるシステムと比較すると、比喩としてのスカラー演算の最適化の影響が非常に大きい。
+よって、比喩としてのベクトル演算性能が非常に高くても、
+全体のRmax/Rpeak比を90％にすることは非常に困難である。</p>
+
+<p>これは、以下のように説明できる：CPUのみのシステムでDGEMMにかかる時間の割合をfとする。
+さらに、DGEMMのRmax/Rpeak比をXとし、それ以外の比をYとした場合、Rmax = (1-f)<em>Y</em>Rpeak + f<em>X</em>Rpeakとなる。
+CPUのみのシステムの場合、Xは100％に近いはずであるが、Yはそれほど大きくはないはずである。
+しかし、問題サイズが十分大きいならはfは限りなく100％に近くなるはずなので、
+Rmax/Rpeak比は第二項のみで決まることになる。
+仮に問題サイズを変えずに、アクセラレータを使う場合、
+fが元の数分の一になってしまうため、Rmaxにおける第一項は無視できなくなる。
+スカラー演算性能とベクトル演算性能の比をQとすると、「Discovery」の場合はQ = 1/6である。
+Qの関数として、Rmax/Rpeak = (1/Q - 1) Y + 1/( 1 + 1/Q ) X = 5/7 Y + 1/7 X となる。
+つまりYの値がクリティカルである。
+X = 90％, Y = 70％の場合Rmax/Rpeak = 63％となった。Yが80％なら70％である。
+結局比喩としてのベクトル演算性能が極大化されたとしても、
+Qの値が極端な場合、つまりバランスのとれたシステムでない場合、
+HPLでRmax/Rpeak比の高効率を得ることはより困難となる。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">N.Nakasato</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-19T22:55:00+09:00" pubdate data-updated="true">Jun 19<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://dadeba.github.com/blog/2012/06/19/top500-and-intel-phi/" data-via="dadeba" data-counturl="http://dadeba.github.com/blog/2012/06/19/top500-and-intel-phi/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/10/gpu-instruction-mix/" title="Previous Post: GPU Instruction Mix">&laquo; GPU Instruction Mix</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/06/19/top500-and-intel-phi/">TOP500 and Intel Phi</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/10/gpu-instruction-mix/">GPU Instruction Mix</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/11/gnuplot-on-ubuntu-10-dot-04/">gnuplot on Ubuntu 10.04</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/28/note-on-regional-advantage/">Note on Regional Advantage</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/23/g5-like-functions-in-opencl/">G5 like functions in OpenCL</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("dadeba", 5, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/dadeba" class="twitter-follow-button" data-show-count="true">Follow @dadeba</a>
+  
+</section>
+
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/dadeba">@dadeba</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'dadeba',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - N.Nakasato -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

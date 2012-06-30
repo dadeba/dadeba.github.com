@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Note on OpenCL SDKs - メモ</title>
+  <meta name="author" content="N.Nakasato">
+
+  
+  <meta name="description" content="ICDとその設定について OpenCLには、SDKを実行時に切り替えることのできる、Installable Client Driver (ICD) Loaderという仕組みがある。
+コンパイル時にリンクされる&#8221;libOpenCL.so&#8221;には、エントリーポイントのみがあり、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://dadeba.github.com/blog/2012/03/10/note-on-opencl-sdks">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="メモ" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">メモ</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:dadeba.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Note on OpenCL SDKs</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-10T00:00:00+09:00" pubdate data-updated="true">Mar 10<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>ICDとその設定について</h2>
+
+<p>OpenCLには、SDKを実行時に切り替えることのできる、Installable Client Driver (ICD) Loaderという仕組みがある。
+コンパイル時にリンクされる&#8221;libOpenCL.so&#8221;には、エントリーポイントのみがあり、
+ICDによって各SDKのライブラリ実体が動的にリンクされる。
+そのため、ランタイムは実体ライブラリをサーチするパスを&#8221;/etc/OpenCL/vendors&#8221;から読み込む。
+ここに、ライブラリへのパスを書いただけのファイルを置いておけばいい。
+下記のSDKのどれか(Appleは異なる)をインストールすると、
+&#8220;/etc/OpenCL/vendors/amdocl64.icd&#8221;などのファイルが作られる。</p>
+
+<p>root権限がある場合には何も考えずに指示どおりにSDKをインストールすればよいのだが、
+そうもいかない場合には、ホームディレクトリ等にもSDKをインストールすることもできる。
+この場合、ICDの設定ディレクトリのは以下の環境変数で設定すればよい。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>OPENCL_VENDOR_PATH=$(HOME)/lib/OpenCL</span></code></pre></td></tr></table></div></figure>
+
+
+<p>AMD, Intel, NvidiaのSDKはこの方法で動作することを確認している。
+IntelのSDKだけは、ここにあるファイルにfullpathを書かないとだめ。</p>
+
+<h2>2012年3月の各社のOpenCL SDKの現状</h2>
+
+<p>自分で試したSDKのみ。五十音順。</p>
+
+<h3>AMD</h3>
+
+<p>最新バージョンは<a href="http://developer.amd.com/sdks/AMDAPPSDK/Pages/default.aspx">AMD APP 2.6</a>である。
+AMDのSDK6c6c6c6cは、OpenCLのバックエンドがCatalystというGPU用のデバイスドライバに分離されている。
+そのため、SDKのバックエンドと、ある時点での最新のバックエンドには、結構なリビジョンの差がある。
+GPUのバックエンドは当然Catalyst付属のものが新しい。CPUのバックエンドは。。。(調査中)</p>
+
+<p>AMDのSDKは、CPUとGPUをどちらもサポートしていて、CPUの種類にも特に制限はない。　</p>
+
+<h3>Apple</h3>
+
+<p>Lion以降のOS XにはOpenCLの開発環境が含まれている。
+利用するにはXcodeのインストールも必要だろう。
+AppleのSDKは、ヘッダの位置とライブラリをリンクする方法が特殊。例えば以下のように。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gcc main.c -framework OpenCL</span></code></pre></td></tr></table></div></figure>
+
+
+<p>AppleのSDKは、CPUとGPUをどちらもサポートしている。
+手元には、2010年のMac Book Airしかないので、パフォーマンスについては不明。
+あまり速くないような感じ。　</p>
+
+<h3>Intel</h3>
+
+<p>最新バージョンは<a href="http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/">1.5</a>である。
+現バージョンはCPUのみサポート。将来はIGPをサポートするらしい。
+IntelのSDKの困ったところは、CPUでSSE3命令(以降)をサポートしていないと動作しないということ。
+そのため、AMDのプロセッサではBulldozer以降のアーキテクチャでないと動作しない。
+また、IntelのCPUで、アーキテクチャ的にはSSE3命令をサポートしていても、
+Linuxのカーネルが古くて、SSE3以降の命令を認識しない場合動作しない。</p>
+
+<p>自動ベクトル化をしてくれるのが売り。</p>
+
+<h3>NVIDIA</h3>
+
+<p>NVIDIAのSDKはCUDAのSDKに含まれている。リンクするライブラリの実体も&#8221;libcuda.so&#8221;だったりする。
+NVIDIAのSDKはNVIDIAのGPUのみサポートしている。</p>
+
+<p>現時点での問題は、Fermiアーキテクチャでの共有メモリの設定である。
+Fermiでは、共有メモリと1st cacheの容量が調整可能になっていて、
+それぞれの容量を48/16KB or 16/48KBと切り替えることができる。
+CUDAではコンパイルオプションで切り替えることができるようであるが、OpenCLではそのやり方がいまだ不明である。</p>
+
+<p>CUDAとOpenCLの間には性能に差がある、というのが定説的な感じであるが、
+最近はギャップが小さくなってきてるようである。
+例えば
+<a href="http://www.cc.gatech.edu/~vetter/keeneland/tutorial-2012-02-20/13-shoc.pdf">Keeneland Workshop at GTのこのスライド</a>
+で、色々なカーネルをCUDAとOpenCLで実装して性能比較している。
+一部のカーネルを除いて、性能差はなくなってきている。
+上記、共有メモリと1st cacheの容量変更ができるようになれば、さらに差はなくなるはずである。　</p>
+
+<h2>OpenCLの本</h2>
+
+<p><a href="http://www.amazon.co.jp/dp/484432814X/">OpenCL入門 - マルチコアCPU・GPUのための並列プログラミング</a>は、学生用に買った日本語の本。既に少し古いが、もうじき新版が発売される。</p>
+
+<p><a href="http://www.amazon.co.jp/dp/1617290173">OpenCL in Action: How to Accelerate Graphics and Computations</a>は、SC11に行った時に、どっかのブースで展示してあった。その場で買うつもりが、気づいたら売り切れていたので、帰国後注文した。cl.hppの使い方はこれで学んだ。わかりやすい。</p>
+
+<p><a href="http://www.amazon.co.jp/dp/0123877660/">Heterogeneous Computing with OpenCL</a>は、買ったばかり。著者はAMDの人達で、AMDのGPUアーキテクチャについての解説がChapter 6にあるのが珍しいかも。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">N.Nakasato</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-10T00:00:00+09:00" pubdate data-updated="true">Mar 10<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://dadeba.github.com/blog/2012/03/10/note-on-opencl-sdks/" data-via="dadeba" data-counturl="http://dadeba.github.com/blog/2012/03/10/note-on-opencl-sdks/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/03/09/first-post/" title="Previous Post: ファーストポスト">&laquo; ファーストポスト</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/03/16/more-note-on-parallel-octree/" title="Next Post: More Note on Parallel Octree">More Note on Parallel Octree &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/06/19/top500-and-intel-phi/">TOP500 and Intel Phi</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/10/gpu-instruction-mix/">GPU Instruction Mix</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/11/gnuplot-on-ubuntu-10-dot-04/">gnuplot on Ubuntu 10.04</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/28/note-on-regional-advantage/">Note on Regional Advantage</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/03/23/g5-like-functions-in-opencl/">G5 like functions in OpenCL</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("dadeba", 5, true);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/dadeba" class="twitter-follow-button" data-show-count="true">Follow @dadeba</a>
+  
+</section>
+
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/dadeba">@dadeba</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'dadeba',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - N.Nakasato -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
