@@ -1,51 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>http://dadeba.github.com/blog/2012/02/27/cray-and-supercomputers/</loc>
-        <lastmod>2012-03-21T11:07:45+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/02/28/us-national-labs-and-supercomputing/</loc>
-        <lastmod>2012-03-21T11:09:07+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/03/09/first-post/</loc>
-        <lastmod>2012-03-09T07:09:11+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/03/10/note-on-opencl-sdks/</loc>
-        <lastmod>2012-03-16T19:26:42+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/03/16/more-note-on-parallel-octree/</loc>
-        <lastmod>2012-03-28T09:06:39+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/03/23/g5-like-functions-in-opencl/</loc>
-        <lastmod>2012-03-24T12:15:37+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/03/28/note-on-regional-advantage/</loc>
-        <lastmod>2012-03-28T23:29:47+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/04/11/gnuplot-on-ubuntu-10-dot-04/</loc>
-        <lastmod>2012-05-10T10:33:38+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/05/10/gpu-instruction-mix/</loc>
-        <lastmod>2012-05-12T06:26:33+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/2012/06/19/top500-and-intel-phi/</loc>
-        <lastmod>2012-06-20T01:23:00+09:00</lastmod>
-    </url>
-    <url>
-        <loc>http://dadeba.github.com/blog/archives/</loc>
-        <lastmod>2012-06-20T01:23:00+09:00</lastmod>
+        <loc>http://dadeba.github.com/blog/2012/06/30/2012-custom-interconnect/</loc>
+        <lastmod>2012-06-30T11:37:39+09:00</lastmod>
     </url>
     <url>
         <loc>http://dadeba.github.com/</loc>
-        <lastmod>2012-06-20T01:23:00+09:00</lastmod>
+        <lastmod>2012-06-30T11:37:39+09:00</lastmod>
+    </url>
+    <url>
+        <loc>http://dadeba.github.com/blog/archives/</loc>
+        <lastmod>2012-06-30T11:37:39+09:00</lastmod>
     </url>
 </urlset>
