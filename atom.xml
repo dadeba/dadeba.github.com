@@ -4,7 +4,7 @@
   <title><![CDATA[]]></title>
   <link href="http://dadeba.github.com/atom.xml" rel="self"/>
   <link href="http://dadeba.github.com/"/>
-  <updated>2012-06-30T11:37:45+09:00</updated>
+  <updated>2012-06-30T12:23:34+09:00</updated>
   <id>http://dadeba.github.com/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -19,6 +19,17 @@
     <updated>2012-06-30T11:35:00+09:00</updated>
     <id>http://dadeba.github.com/blog/2012/06/30/2012-custom-interconnect</id>
     <content type="html"><![CDATA[<p>てすと。ふっかつ。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Old Posts]]></title>
+    <link href="http://dadeba.github.com/blog/2012/06/30/old-posts/"/>
+    <updated>2012-06-30T00:00:00+09:00</updated>
+    <id>http://dadeba.github.com/blog/2012/06/30/old-posts</id>
+    <content type="html"><![CDATA[<p>諸事情により過去のポストのソースコードが消えてしまったので仕切り直し。</p>
+
+<p>古いポストは→ http://dadeba.github.com/old.html</p>
 ]]></content>
   </entry>
   
