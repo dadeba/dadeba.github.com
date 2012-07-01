@@ -4,7 +4,7 @@
   <title><![CDATA[]]></title>
   <link href="http://dadeba.github.com/atom.xml" rel="self"/>
   <link href="http://dadeba.github.com/"/>
-  <updated>2012-06-30T13:10:57+09:00</updated>
+  <updated>2012-07-01T13:21:38+09:00</updated>
   <id>http://dadeba.github.com/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -27,8 +27,9 @@
 <p><a href="http://apegate.roma1.infn.it/mediawiki/index.php/Main_Page">http://apegate.roma1.infn.it/mediawiki/index.php/Main_Page</a></p>
 
 <ul>
-<li>用途はLattice QCD。</li>
-<li>FPGAベース。</li>
+<li>APEというのはもともとLattice QCD(LQCD)のための計算機を作るというプロジェクトで、80年代にはじまっている。</li>
+<li>なかでも<a href="http://apegate.roma1.infn.it/mediawiki/index.php/APEnet%2B_project">APEnet+</a>が、LQCD計算のための高速なインターコネクトをFPGAを使って作プロジェクト。</li>
+<li>2D/3Dトーラス。PCIe x8 gen.2。port 14 Gbps。レイテンシは4 usecくらい。</li>
 </ul>
 
 
@@ -40,11 +41,12 @@
 <li><a href="http://www.deep-project.eu/deep-project/EN/Home/home_node.html">DEEP Project</a> = Dynamical Exascale Entry Platform</li>
 <li>エクサ級の計算機の一部として、IntelのMIC(Phi)を3Dトーラスで接続したCluster Boosterというものを計画している。この部分にEXTOLLが使われる。</li>
 <li>それとは別にホスト計算機のクラスターがあり、ホストとCluster BoosterはInifiband等で接続される。</li>
-<li>なんか既視感。</li>
 <li>EXTOLLはHeidelberg大学で研究されていて、その技術をもとにスピンオフした会社がある。</li>
 <li>プロトタイプはFPGAベースかつバスがHTX。</li>
 <li>用途は汎用。</li>
 <li>現在ASICベースのものを開発中とのこと。</li>
+<li>3Dトーラス。<a href="http://www.extoll.de/images/pdf/extoll_technology_overview.pdf">パンフレット</a>によると、Virtex6のプロトタイプは2.4GB/secだから、6本だとすると、1 portあたり32 Gbps。ASICのものはさらに5倍。レイテンシは1 usec以下。</li>
+<li>某TKB大学でみたような計算機だなー(棒)。</li>
 </ul>
 
 
@@ -52,7 +54,8 @@
 
 <ul>
 <li>まだ商用品ではないので、いちおうリスト。</li>
-<li>Fat-tree。</li>
+<li>ソースは<a href="http://dx.doi.org/10.1109/MM.2011.97">IEEE Microの論文</a></li>
+<li>Fat-tree。レイテンシは</li>
 </ul>
 
 
